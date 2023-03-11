@@ -1,5 +1,6 @@
 package com.victorreis.msusers.service;
 
+import com.victorreis.msusers.exception.NotFoundException;
 import com.victorreis.msusers.model.dto.UserResponse;
 import com.victorreis.msusers.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -21,5 +22,11 @@ public class UserService {
     public List<UserResponse> getAllUsers() {
         log.info("Getting all users...");
         return userRepository.findAll().stream().map(UserResponse::toResponse).toList();
+    }
+
+    public UserResponse getUserById(String userId) {
+        return userRepository.findById(userId)
+                .map(UserResponse::toResponse)
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 }
