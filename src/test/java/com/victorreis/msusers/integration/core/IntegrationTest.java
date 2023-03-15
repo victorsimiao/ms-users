@@ -1,4 +1,4 @@
-package com.victorreis.msusers.integration;
+package com.victorreis.msusers.integration.core;
 
 
 import com.victorreis.msusers.MsUsersApplication;
