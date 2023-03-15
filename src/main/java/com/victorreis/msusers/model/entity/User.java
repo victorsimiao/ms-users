@@ -1,6 +1,7 @@
 package com.victorreis.msusers.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.victorreis.msusers.model.dto.UserRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -35,5 +36,12 @@ public class User {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:SS")
     private LocalDateTime createdAt;
 
+
+    public static User valueOf(UserRequest userRequest) {
+        return User.builder()
+                .name(userRequest.getName())
+                .age(userRequest.getAge())
+                .build();
+    }
 
 }

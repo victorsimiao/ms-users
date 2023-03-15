@@ -1,14 +1,16 @@
 package com.victorreis.msusers.controller;
 
+import com.victorreis.msusers.model.dto.UserRequest;
 import com.victorreis.msusers.model.dto.UserResponse;
 import com.victorreis.msusers.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
+
+import static java.lang.String.format;
 
 @RestController
 @RequestMapping("/users")
@@ -28,5 +30,12 @@ public class UserController {
     @GetMapping("/{userid}")
     public ResponseEntity<UserResponse> getUserByid(@PathVariable("userid") String userId) {
         return ResponseEntity.ok(userService.getUserById(userId));
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> createUser(@RequestBody @Valid UserRequest userRequest) {
+        String createdUserId = userService.createUser(userRequest);
+        URI location = URI.create(format("/users/%s", createdUserId));
+        return ResponseEntity.created(location).build();
     }
 }
