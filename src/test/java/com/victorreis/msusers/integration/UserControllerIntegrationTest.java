@@ -1,13 +1,15 @@
 package com.victorreis.msusers.integration;
 
-import com.victorreis.msusers.integration.core.IntegrationTest;
 import com.victorreis.msusers.factory.Userfactory;
+import com.victorreis.msusers.integration.core.IntegrationTest;
 import com.victorreis.msusers.model.entity.User;
 import com.victorreis.msusers.repository.UserRepository;
+import com.victorreis.msusers.utils.FilesUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -16,6 +18,7 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.jdbc.JdbcTestUtils.deleteFromTables;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,6 +36,7 @@ public class UserControllerIntegrationTest {
 
     private static final String USERS_ENDPOINT = "/users";
     private static final String USERS_BY_ID_ENDPOINT = "/users/{userId}";
+
 
     @BeforeEach
     void setup() {
@@ -64,11 +68,11 @@ public class UserControllerIntegrationTest {
         String uuid = userTest.getUuid();
 
 
-        mockMvc.perform(get(USERS_BY_ID_ENDPOINT,uuid))
+        mockMvc.perform(get(USERS_BY_ID_ENDPOINT, uuid))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name",is(userTest.getName())))
-                .andExpect(jsonPath("$.age",is(userTest.getAge())))
-                .andExpect(jsonPath("$.uuid",hasLength(uuid.length())));
+                .andExpect(jsonPath("$.name", is(userTest.getName())))
+                .andExpect(jsonPath("$.age", is(userTest.getAge())))
+                .andExpect(jsonPath("$.uuid", hasLength(uuid.length())));
     }
 
 
@@ -78,8 +82,21 @@ public class UserControllerIntegrationTest {
         String invalidUuid = UUID.randomUUID().toString();
 
 
-        mockMvc.perform(get(USERS_BY_ID_ENDPOINT,invalidUuid))
+        mockMvc.perform(get(USERS_BY_ID_ENDPOINT, invalidUuid))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should create a new user")
+    void shouldCreateANewUser() throws Exception {
+        String requestBody = FilesUtils.getJsonFromFile("createUser.json");
+
+
+        mockMvc.perform(post(USERS_ENDPOINT)
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
     }
 
 }
