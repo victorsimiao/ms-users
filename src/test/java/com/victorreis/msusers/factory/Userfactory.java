@@ -31,4 +31,5 @@ public final class Userfactory {
                 User.builder().uuid(UUID.randomUUID().toString()).name("Maria").age(20).createdAt(LocalDateTime.now()).updatedAT(LocalDateTime.now()).build()
         );
     }
+
 }
