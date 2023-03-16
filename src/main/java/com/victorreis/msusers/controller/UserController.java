@@ -38,4 +38,10 @@ public class UserController {
         URI location = URI.create(format("/users/%s", createdUserId));
         return ResponseEntity.created(location).build();
     }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<Void> updateUser(@PathVariable(name = "userId") String userId, @RequestBody @Valid UserRequest userRequest) {
+        userService.updateUser(userId, userRequest);
+        return ResponseEntity.noContent().build();
+    }
 }
