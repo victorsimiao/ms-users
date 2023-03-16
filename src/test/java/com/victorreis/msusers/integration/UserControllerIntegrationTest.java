@@ -1,6 +1,5 @@
 package com.victorreis.msusers.integration;
 
-import com.victorreis.msusers.factory.Userfactory;
 import com.victorreis.msusers.integration.core.IntegrationTest;
 import com.victorreis.msusers.model.entity.User;
 import com.victorreis.msusers.repository.UserRepository;
@@ -15,10 +14,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
+import static com.victorreis.msusers.factory.Userfactory.createUser;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.jdbc.JdbcTestUtils.deleteFromTables;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -63,7 +63,7 @@ public class UserControllerIntegrationTest {
     @Test
     @DisplayName("Should return an user by id")
     void shouldRetunrAnUserById() throws Exception {
-        User userTest = Userfactory.createUser("userTest", 30);
+        User userTest = createUser("userTest", 30);
         userRepository.save(userTest);
         String uuid = userTest.getUuid();
 
@@ -97,6 +97,72 @@ public class UserControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
+    }
+
+    @Test
+    @DisplayName("Should update an existing user and return no content")
+    void shouldUpdateAnExistingUserAndReturnNoContent() throws Exception {
+        User userPutTest = createUser("UserPutTest", 28);
+        userRepository.save(userPutTest);
+        String uuid = userPutTest.getUuid();
+
+        String requestBody = FilesUtils.getJsonFromFile("updateUser.json");
+
+        mockMvc.perform(put(USERS_BY_ID_ENDPOINT, uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isNoContent());
+
+        User updateUser = userRepository.findById(uuid).get();
+        assertThat(updateUser.getUuid()).isNotNull();
+        assertThat(updateUser.getName()).isEqualTo("Update User Integration Test");
+        assertThat(updateUser.getAge()).isEqualTo(31);
+    }
+
+    @Test
+    @DisplayName("Should return not found when the userId is invalid")
+    void shouldReturnNotFoundWhenTheUserIdIsInvalid() throws Exception {
+        String uuid = UUID.randomUUID().toString();
+
+        String resquestBody = FilesUtils.getJsonFromFile("updateUser.json");
+
+        mockMvc.perform(put(USERS_BY_ID_ENDPOINT, uuid)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(resquestBody))
+                
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should return bad request when name key is not present")
+    void shouldReturnBadRequestWhenNameKeyIsNotPresent() throws Exception {
+        User userPutTest = createUser("UserPutTest", 28);
+        userRepository.save(userPutTest);
+        String uuid = userPutTest.getUuid();
+
+        String resquestBody = FilesUtils.getJsonFromFile("updateUserWithOutName.json");
+
+        mockMvc.perform(put(USERS_BY_ID_ENDPOINT, uuid)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(resquestBody))
+
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return bad request when age key is not present")
+    void shouldReturnBadRequestWhenAgeKeyIsNotPresent() throws Exception {
+        User userPutTest = createUser("UserPutTest", 28);
+        userRepository.save(userPutTest);
+        String uuid = userPutTest.getUuid();
+
+        String resquestBody = FilesUtils.getJsonFromFile("updateUserWithOutAge.json");
+
+        mockMvc.perform(put(USERS_BY_ID_ENDPOINT, uuid)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(resquestBody))
+
+                .andExpect(status().isBadRequest());
     }
 
 }
