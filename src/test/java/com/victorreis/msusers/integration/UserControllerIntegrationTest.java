@@ -1,7 +1,7 @@
 package com.victorreis.msusers.integration;
 
 import com.victorreis.msusers.integration.core.IntegrationTest;
-import com.victorreis.msusers.integration.factory.Userfactory;
+import com.victorreis.msusers.factory.Userfactory;
 import com.victorreis.msusers.model.entity.User;
 import com.victorreis.msusers.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
