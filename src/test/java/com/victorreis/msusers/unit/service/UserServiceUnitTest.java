@@ -128,11 +128,11 @@ public class UserServiceUnitTest {
 
     @Test
     @DisplayName("Should throw Not Found when userId does not exist")
-    void shouldThrowNotFoundExceptionWhenUserIdDoesNotExist(){
+    void shouldThrowNotFoundExceptionWhenUserIdDoesNotExist() {
         String uuid = UUID.randomUUID().toString();
         when(userRepository.findById(uuid)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(()-> userService.updateUser(uuid,any(UserRequest.class)))
+        assertThatThrownBy(() -> userService.updateUser(uuid, any(UserRequest.class)))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("User not found");
 
@@ -141,4 +141,37 @@ public class UserServiceUnitTest {
         verifyNoMoreInteractions(userRepository);
     }
 
+    @Test
+    @DisplayName("Should partial upadate an user")
+    void shouldPartialUpdateAnUser() {
+        String uuid = UUID.randomUUID().toString();
+        UserRequest userTest = UserRequest.builder().name("Upadate User Test").build();
+        User user = createUser("User", 20);
+
+        when(userRepository.findById(uuid)).thenReturn(Optional.of(user));
+
+        assertThatCode(()-> userService.partialUpdateUser(uuid,userTest)).doesNotThrowAnyException();
+
+        verify(userRepository,times(1)).findById(uuid);
+        verify(userRepository,times(1)).save(any(User.class));
+        verifyNoMoreInteractions(userRepository);
+    }
+
+    @Test
+    @DisplayName("Should not partial update an user due to a Not Found Exception")
+    void shouldNotPartialUpdateAnUserDueToANotFoundException(){
+        String uuid = UUID.randomUUID().toString();
+        UserRequest userTest = UserRequest.builder().name("Upadate User Test").build();
+
+        when(userRepository.findById(uuid)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(()->userService.partialUpdateUser(uuid,userTest))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("User not found");
+
+        verify(userRepository, times(1)).findById(uuid);
+        verify(userRepository, never()).save(any(User.class));
+        verifyNoMoreInteractions(userRepository);
+
+    }
 }
