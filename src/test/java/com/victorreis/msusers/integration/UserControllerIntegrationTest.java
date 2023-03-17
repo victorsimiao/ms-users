@@ -205,4 +205,18 @@ public class UserControllerIntegrationTest {
         assertThat(updateUser.getAge()).isEqualTo(30);
     }
 
+
+    @Test
+    @DisplayName("Should delete Existing User by id and return non content")
+    void shouldDeleteExistingUserByIdAndReturnNoContent() throws Exception {
+        User userDeleteTest = createUser("UserDeleteTest", 33);
+        userRepository.save(userDeleteTest);
+        String uuid = userDeleteTest.getUuid();
+
+        mockMvc.perform(delete(USERS_BY_ID_ENDPOINT,uuid))
+                .andExpect(status().isNoContent());
+
+        assertThat(userRepository.findById(uuid).isEmpty());
+    }
+
 }
