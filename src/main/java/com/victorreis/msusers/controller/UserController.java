@@ -46,8 +46,14 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<Void> partialUpdateUser(@PathVariable(name = "userId") String userId,@RequestBody UserRequest userRequest){
-        userService.partialUpdateUser(userId,userRequest);
+    public ResponseEntity<Void> partialUpdateUser(@PathVariable(name = "userId") String userId, @RequestBody UserRequest userRequest) {
+        userService.partialUpdateUser(userId, userRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteById(@PathVariable(name = "userId") String userId) {
+        userService.deleteUserById(userId);
         return ResponseEntity.noContent().build();
     }
 }
