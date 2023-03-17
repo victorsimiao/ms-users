@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
@@ -45,7 +46,7 @@ public class UserService {
     }
 
     public void updateUser(String userId, UserRequest userRequest) {
-        log.info("Updating userId: {}", userId, userRequest);
+        log.info("Updating userId: {} with {}", userId, userRequest);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
@@ -53,4 +54,18 @@ public class UserService {
 
         userRepository.save(user);
     }
+
+    public void partialUpdateUser(String userId, UserRequest userRequest) {
+        log.info("Partial Updating userId: {} with {}", userId, userRequest);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        Optional.ofNullable(userRequest.getName()).ifPresent(user::setName);
+        Optional.ofNullable(userRequest.getAge()).ifPresent(user::setAge);
+
+        user.setUpdatedAT(LocalDateTime.now());
+
+        userRepository.save(user);
+    }
+
 }

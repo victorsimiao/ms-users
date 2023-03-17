@@ -44,4 +44,10 @@ public class UserController {
         userService.updateUser(userId, userRequest);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{userId}")
+    public ResponseEntity<Void> partialUpdateUser(@PathVariable(name = "userId") String userId,@RequestBody UserRequest userRequest){
+        userService.partialUpdateUser(userId,userRequest);
+        return ResponseEntity.noContent().build();
+    }
 }
