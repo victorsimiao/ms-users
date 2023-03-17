@@ -174,4 +174,33 @@ public class UserServiceUnitTest {
         verifyNoMoreInteractions(userRepository);
 
     }
+
+    @Test
+    @DisplayName("Should delete an user by id")
+    void shouldDeleteAnUserById(){
+        String uuid = UUID.randomUUID().toString();
+        User user = createUser("User Test", 25);
+
+        when(userRepository.findById(uuid)).thenReturn(Optional.of(user));
+
+        assertThatCode(()-> userService.deleteUserById(uuid)).doesNotThrowAnyException();
+
+        verify(userRepository, times(1)).findById(uuid);
+        verify(userRepository, times(1)).delete(any(User.class));
+        verifyNoMoreInteractions(userRepository);
+    }
+
+    @Test
+    @DisplayName("Should not delete an user by id because it does not exist")
+    void shouldNotDeleteAnUserByIdBecauseItDoesNotExist(){
+        String uuid = UUID.randomUUID().toString();
+
+        when(userRepository.findById(uuid)).thenReturn(Optional.empty());
+
+        assertThatCode(()-> userService.deleteUserById(uuid)).doesNotThrowAnyException();
+
+        verify(userRepository, times(1)).findById(uuid);
+        verify(userRepository, never()).delete(any(User.class));
+        verifyNoMoreInteractions(userRepository);
+    }
 }
