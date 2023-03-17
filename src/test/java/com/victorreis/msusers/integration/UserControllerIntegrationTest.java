@@ -165,4 +165,44 @@ public class UserControllerIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @DisplayName("Should partially update an existing user name")
+    void shouldPartiallyUpadateAnExistingUserName() throws Exception {
+        User userPutTest = createUser("UserPatchNameTest", 33);
+        userRepository.save(userPutTest);
+        String uuid = userPutTest.getUuid();
+
+        String requestBody = FilesUtils.getJsonFromFile("partiallyUpdateUserName.json");
+
+        mockMvc.perform(patch(USERS_BY_ID_ENDPOINT, uuid)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isNoContent());
+
+        User updateUser = userRepository.findById(uuid).get();
+        assertThat(updateUser.getUuid()).isNotNull();
+        assertThat(updateUser.getName()).isEqualTo("Partially Update User Integration Test");
+        assertThat(updateUser.getAge()).isEqualTo(33);
+    }
+
+    @Test
+    @DisplayName("Should partially update an existing user age")
+    void shouldPartiallyUpadateAnExistingUserAge() throws Exception {
+        User userPutTest = createUser("UserPatchAgeTest", 33);
+        userRepository.save(userPutTest);
+        String uuid = userPutTest.getUuid();
+
+        String requestBody = FilesUtils.getJsonFromFile("partiallyUpdateUserAge.json");
+
+        mockMvc.perform(patch(USERS_BY_ID_ENDPOINT, uuid)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isNoContent());
+
+        User updateUser = userRepository.findById(uuid).get();
+        assertThat(updateUser.getUuid()).isNotNull();
+        assertThat(updateUser.getName()).isEqualTo("UserPatchAgeTest");
+        assertThat(updateUser.getAge()).isEqualTo(30);
+    }
+
 }
